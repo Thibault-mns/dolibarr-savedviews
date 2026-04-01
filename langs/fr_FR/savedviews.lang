@@ -1,0 +1,9 @@
+# SavedViews language file - French
+
+SaveView=Enregistrer la vue
+EnterViewLabel=Entrez un nom pour cette vue
+DeleteView=Supprimer cette vue
+ConfirmDeleteView=Êtes-vous sûr de vouloir supprimer cette vue ?
+ViewSaved=Vue enregistrée avec succès
+ViewDeleted=Vue supprimée
+Error=Erreur

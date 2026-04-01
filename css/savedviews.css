@@ -1,0 +1,140 @@
+/**
+ * SavedViews - CSS Styles
+ */
+
+.savedviews-container {
+    margin: 5px 0 10px 0;
+    padding: 0;
+}
+
+.savedviews-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 0;
+}
+
+.savedviews-tab {
+    display: inline-flex;
+    align-items: center;
+    background: #f4f4f4;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 0.85em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    max-width: 150px;
+}
+
+.savedviews-tab:hover {
+    background: #e8e8e8;
+    border-color: #999;
+}
+
+.savedviews-tab-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 120px;
+    color: #333;
+}
+
+.savedviews-tab-delete {
+    margin-left: 6px;
+    color: #999;
+    font-weight: bold;
+    font-size: 1.1em;
+    line-height: 1;
+    padding: 0 2px;
+    border-radius: 3px;
+    transition: all 0.2s ease;
+}
+
+.savedviews-tab-delete:hover {
+    color: #c00;
+    background: rgba(200, 0, 0, 0.1);
+}
+
+.savedviews-add {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: #f8f8f8;
+    border: 1px dashed #aaa;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #666;
+}
+
+.savedviews-add:hover {
+    background: #e0f0e0;
+    border-color: #4a4;
+    color: #4a4;
+}
+
+.savedviews-add .fa {
+    font-size: 14px;
+}
+
+/* Notification styles (fallback if Dolibarr's setEventMessages is not available) */
+.savedviews-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 12px 20px;
+    border-radius: 4px;
+    color: #fff;
+    font-size: 14px;
+    z-index: 10000;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    transition: opacity 0.3s ease;
+}
+
+.savedviews-notification-success {
+    background: #28a745;
+}
+
+.savedviews-notification-error {
+    background: #dc3545;
+}
+
+.savedviews-notification-fade {
+    opacity: 0;
+}
+
+/* Dark theme support */
+body.theme-eldy-dark .savedviews-tab,
+body.theme-md-dark .savedviews-tab {
+    background: #3a3a3a;
+    border-color: #555;
+}
+
+body.theme-eldy-dark .savedviews-tab:hover,
+body.theme-md-dark .savedviews-tab:hover {
+    background: #4a4a4a;
+    border-color: #777;
+}
+
+body.theme-eldy-dark .savedviews-tab-label,
+body.theme-md-dark .savedviews-tab-label {
+    color: #ddd;
+}
+
+body.theme-eldy-dark .savedviews-add,
+body.theme-md-dark .savedviews-add {
+    background: #3a3a3a;
+    border-color: #666;
+    color: #aaa;
+}
+
+body.theme-eldy-dark .savedviews-add:hover,
+body.theme-md-dark .savedviews-add:hover {
+    background: #2a4a2a;
+    border-color: #6a6;
+    color: #6a6;
+}
