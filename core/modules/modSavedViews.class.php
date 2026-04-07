@@ -30,7 +30,7 @@ class modSavedViews extends DolibarrModules
         global $langs, $conf;
         $this->db = $db;
 
-        $this->numero = 500200;
+        $this->numero = 185429;
         $this->rights_class = 'savedviews';
         $this->family = "tools";
         $this->module_position = '90';
