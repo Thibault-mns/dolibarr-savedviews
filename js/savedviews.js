@@ -66,7 +66,7 @@
         // Capture filter values from tr.liste_titre_filter inputs
         const filterInputs = document.querySelectorAll('tr.liste_titre_filter input, tr.liste_titre_filter select');
         filterInputs.forEach(input => {
-            if (input.name && input.value) {
+            if (input.name && input.value !== undefined && input.value !== '') {
                 state.filters[input.name] = input.value;
             }
         });
@@ -75,7 +75,7 @@
         const divListeTitreInputs = document.querySelectorAll('div.liste_titre input, div.liste_titre select');
         divListeTitreInputs.forEach(input => {
             if (!input.name) return;
-            
+
             // Handle multiselect (arrays like search_category_order_list[])
             if (input.tagName === 'SELECT' && input.multiple) {
                 const selectedValues = Array.from(input.selectedOptions).map(opt => opt.value);
@@ -86,10 +86,33 @@
                 if (input.checked) {
                     state.filters[input.name] = input.value || '1';
                 }
-            } else if (input.value && input.value !== '' && input.value !== '-1') {
+            } else if (input.value !== undefined && input.value !== '') {
+                // Keep -1 as valid value (used for "all" or specific status filters)
                 state.filters[input.name] = input.value;
             }
         });
+
+        // Capture all search_* inputs from the main form (status, billed, etc.)
+        const searchForm = document.querySelector('form[name="searchFormList"], form#searchFormList');
+        if (searchForm) {
+            const formInputs = searchForm.querySelectorAll('input[name^="search_"], select[name^="search_"]');
+            formInputs.forEach(input => {
+                if (!input.name || state.filters[input.name] !== undefined) return; // Skip already captured
+
+                if (input.tagName === 'SELECT' && input.multiple) {
+                    const selectedValues = Array.from(input.selectedOptions).map(opt => opt.value);
+                    if (selectedValues.length > 0) {
+                        state.filters[input.name] = selectedValues;
+                    }
+                } else if (input.type === 'checkbox') {
+                    if (input.checked) {
+                        state.filters[input.name] = input.value || '1';
+                    }
+                } else if (input.value !== undefined && input.value !== '') {
+                    state.filters[input.name] = input.value;
+                }
+            });
+        }
 
         // Capture selectedfields (visible columns)
         const selectedFieldsInput = document.querySelector('input.selectedfields[name="selectedfields"]');
@@ -109,24 +132,28 @@
         // Build URL with all filter parameters
         const baseUrl = window.location.pathname;
         const params = new URLSearchParams();
-        
+
         // Add display mode
         if (state.displayMode && state.displayMode !== 'common') {
             params.set('mode', state.displayMode);
         }
-        
-        // Add all filter values from inputs (include all values, even -1 which is valid in Dolibarr)
-        filterInputs.forEach(input => {
-            if (input.name && input.value !== undefined && input.value !== '') {
-                params.set(input.name, input.value);
+
+        // Add all captured filter values
+        Object.keys(state.filters).forEach(name => {
+            const value = state.filters[name];
+            if (Array.isArray(value)) {
+                // For multiselect, add each value
+                value.forEach(v => params.append(name, v));
+            } else if (value !== undefined && value !== '') {
+                params.set(name, value);
             }
         });
-        
+
         // Also add contextpage if present in current URL
         if (urlParams.has('contextpage')) {
             params.set('contextpage', urlParams.get('contextpage'));
         }
-        
+
         // Build final URL
         const queryString = params.toString();
         state.url = window.location.origin + baseUrl + (queryString ? '?' + queryString : '');
@@ -142,111 +169,40 @@
             return;
         }
 
-        // Find the search form
-        const searchForm = document.querySelector('form[name="searchFormList"], form#searchFormList');
-        if (!searchForm) {
-            // Fallback to URL redirect if no form found
-            if (viewData.url) {
-                window.location.href = viewData.url;
-            }
+        // Simple and reliable: redirect to saved URL with all filters
+        if (viewData.url) {
+            window.location.href = viewData.url;
             return;
         }
 
-        // Reset all filter inputs first
-        const allInputs = searchForm.querySelectorAll('input[name^="search_"], select[name^="search_"]');
-        allInputs.forEach(input => {
-            if (input.type === 'checkbox') {
-                input.checked = false;
-            } else if (input.tagName === 'SELECT') {
-                input.selectedIndex = 0;
-            } else {
-                input.value = '';
-            }
-        });
-
-        // Apply saved filter values
+        // Fallback: build URL from filters if url not saved
         if (viewData.filters) {
+            const params = new URLSearchParams();
+
+            // Add display mode
+            if (viewData.displayMode && viewData.displayMode !== 'common') {
+                params.set('mode', viewData.displayMode);
+            }
+
+            // Add all filter values
             Object.keys(viewData.filters).forEach(name => {
-                const filterValue = viewData.filters[name];
-                const input = searchForm.querySelector('[name="' + name + '"]');
-                
-                if (input) {
-                    if (input.tagName === 'SELECT' && input.multiple) {
-                        // Handle multiselect - clear all and select saved values
-                        Array.from(input.options).forEach(opt => opt.selected = false);
-                        const values = Array.isArray(filterValue) ? filterValue : [filterValue];
-                        values.forEach(val => {
-                            const option = input.querySelector('option[value="' + val + '"]');
-                            if (option) option.selected = true;
-                        });
-                        // Trigger change for Select2
-                        if (typeof jQuery !== 'undefined') {
-                            jQuery(input).trigger('change');
-                        }
-                    } else if (input.tagName === 'SELECT') {
-                        // For single select, find the option with matching value
-                        const options = input.options;
-                        for (let i = 0; i < options.length; i++) {
-                            if (options[i].value === String(filterValue)) {
-                                input.selectedIndex = i;
-                                break;
-                            }
-                        }
-                        // Trigger change for Select2
-                        if (typeof jQuery !== 'undefined') {
-                            jQuery(input).trigger('change');
-                        }
-                    } else if (input.type === 'checkbox') {
-                        input.checked = filterValue === '1' || filterValue === 'on' || filterValue === true;
-                    } else {
-                        input.value = filterValue;
-                    }
+                const value = viewData.filters[name];
+                if (Array.isArray(value)) {
+                    value.forEach(v => params.append(name, v));
+                } else if (value !== undefined && value !== '') {
+                    params.set(name, value);
                 }
             });
-        }
 
-        // Apply selectedfields (visible columns)
-        if (viewData.selectedFields) {
-            const selectedFieldsInput = searchForm.querySelector('input.selectedfields[name="selectedfields"]');
-            if (selectedFieldsInput) {
-                selectedFieldsInput.value = viewData.selectedFields;
+            // Add selectedfields for columns
+            if (viewData.selectedFields) {
+                params.set('selectedfields', viewData.selectedFields);
+                params.set('formfilteraction', 'listafterchangingselectedfields');
             }
-        }
 
-        // Apply column checkboxes
-        if (viewData.columnCheckboxes) {
-            Object.keys(viewData.columnCheckboxes).forEach(colValue => {
-                const checkbox = searchForm.querySelector('.multiselectcheckboxselectedfields input[type="checkbox"][value="' + colValue + '"]');
-                if (checkbox) {
-                    checkbox.checked = viewData.columnCheckboxes[colValue];
-                }
-            });
+            const queryString = params.toString();
+            window.location.href = window.location.pathname + (queryString ? '?' + queryString : '');
         }
-
-        // Set formfilteraction to trigger column update
-        let formFilterAction = searchForm.querySelector('input[name="formfilteraction"]');
-        if (!formFilterAction) {
-            formFilterAction = document.createElement('input');
-            formFilterAction.type = 'hidden';
-            formFilterAction.name = 'formfilteraction';
-            searchForm.appendChild(formFilterAction);
-        }
-        formFilterAction.value = 'listafterchangingselectedfields';
-
-        // Set display mode if different
-        if (viewData.displayMode) {
-            let modeInput = searchForm.querySelector('input[name="mode"]');
-            if (!modeInput) {
-                modeInput = document.createElement('input');
-                modeInput.type = 'hidden';
-                modeInput.name = 'mode';
-                searchForm.appendChild(modeInput);
-            }
-            modeInput.value = viewData.displayMode;
-        }
-
-        // Submit the form to apply filters
-        searchForm.submit();
     }
 
     /**
