@@ -1,10 +1,18 @@
 <?php
-/* Copyright (C) 2024
+/* Copyright (C) 2024-2026	TH Investissements / Matelas No Stress
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 /**
@@ -30,13 +38,18 @@ class modSavedViews extends DolibarrModules
         global $langs, $conf;
         $this->db = $db;
 
+        // ID from the range 185421-185849 reserved by TH Investissements / Matelas No Stress
+        // on https://wiki.dolibarr.org/index.php/List_of_modules_id
         $this->numero = 185429;
         $this->rights_class = 'savedviews';
         $this->family = "tools";
         $this->module_position = '90';
         $this->name = preg_replace('/^mod/i', '', get_class($this));
-        $this->description = "Sauvegarde de vues pré-filtrées sur les listes";
-        $this->descriptionlong = "Module permettant de sauvegarder et restaurer des vues personnalisées (colonnes, filtres, mode d'affichage) sur toutes les pages de liste Dolibarr";
+        // Keys translated via langs/xx_XX/savedviews.lang
+        $this->description = "SavedViewsDescription";
+        $this->descriptionlong = "SavedViewsDescriptionLong";
+        $this->editor_name = 'TH Investissements / Matelas No Stress';
+        $this->editor_url = 'https://github.com/Thibault-mns';
         $this->version = '1.0.0';
         $this->const_name = 'MAIN_MODULE_' . strtoupper($this->name);
         $this->picto = 'fa-bookmark';

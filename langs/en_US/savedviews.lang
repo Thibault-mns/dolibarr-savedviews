@@ -1,4 +1,7 @@
 # SavedViews language file - English
+ModuleSavedViewsName=SavedViews
+SavedViewsDescription=Save and restore custom views (filters, columns, display mode) on list pages
+SavedViewsDescriptionLong=Adds a bar of bookmark tabs above every Dolibarr list page, letting each user save the current view (search filters, selected columns, list/kanban mode) and reopen it in one click. Views are per-user and per-list.
 
 SaveView=Save view
 EnterViewLabel=Enter a name for this view
@@ -6,4 +9,3 @@ DeleteView=Delete this view
 ConfirmDeleteView=Are you sure you want to delete this view?
 ViewSaved=View saved successfully
 ViewDeleted=View deleted
-Error=Error

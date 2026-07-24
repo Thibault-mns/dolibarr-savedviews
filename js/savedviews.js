@@ -170,9 +170,17 @@
         }
 
         // Simple and reliable: redirect to saved URL with all filters
+        // (same-origin only — a stored URL must never redirect elsewhere)
         if (viewData.url) {
-            window.location.href = viewData.url;
-            return;
+            try {
+                const target = new URL(viewData.url, window.location.origin);
+                if (target.origin === window.location.origin && (target.protocol === 'http:' || target.protocol === 'https:')) {
+                    window.location.href = target.href;
+                    return;
+                }
+            } catch (e) {
+                // Invalid stored URL: fall through to filter-based rebuild
+            }
         }
 
         // Fallback: build URL from filters if url not saved
@@ -300,18 +308,16 @@
      * Check if current page is a list page (index)
      */
     function isListPage() {
-        // Check for searchFormList form (main indicator of list pages)
+        // The main list search form is the reliable marker of a Dolibarr list page.
+        // Do NOT match on div.liste_titre alone: that class also appears on card
+        // and admin pages, which would inject the bar where it does not belong.
         const searchForm = document.querySelector('form[name="searchFormList"], form#searchFormList');
         if (searchForm) return true;
-        
-        // Check for liste_titre_filter row (filter row in lists)
-        const filterRow = document.querySelector('tr.liste_titre_filter');
+
+        // Fallback: a filter row inside an actual list table
+        const filterRow = document.querySelector('table.liste tr.liste_titre_filter');
         if (filterRow) return true;
-        
-        // Check for div.liste_titre with filters
-        const listeTitreDiv = document.querySelector('div.liste_titre');
-        if (listeTitreDiv) return true;
-        
+
         return false;
     }
 
