@@ -142,6 +142,10 @@ class ActionsSavedviews
         if (defined('DOL_URL_ROOT') && DOL_URL_ROOT !== '' && strpos($path, DOL_URL_ROOT) === 0) {
             $path = substr($path, strlen(DOL_URL_ROOT));
         }
+        // Legacy prefixes (installs serving htdocs under /htdocs or /dolibarr with an
+        // empty/mismatched DOL_URL_ROOT) — must stay stripped so existing keys keep matching
+        $path = preg_replace('#^/htdocs#', '', $path);
+        $path = preg_replace('#^/dolibarr#i', '', $path);
 
         $type = GETPOST('type', 'alphanohtml');
         if ($type !== '' && $type !== null) {
