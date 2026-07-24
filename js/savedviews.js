@@ -175,6 +175,12 @@
             try {
                 const target = new URL(viewData.url, window.location.origin);
                 if (target.origin === window.location.origin && (target.protocol === 'http:' || target.protocol === 'https:')) {
+                    // Columns are not applied by the filter params alone: Dolibarr only
+                    // restores them when selectedfields comes with formfilteraction
+                    if (viewData.selectedFields && !target.searchParams.has('selectedfields')) {
+                        target.searchParams.set('selectedfields', viewData.selectedFields);
+                        target.searchParams.set('formfilteraction', 'listafterchangingselectedfields');
+                    }
                     window.location.href = target.href;
                     return;
                 }
