@@ -1,5 +1,7 @@
 # SavedViews — saved list views for Dolibarr
 
+🇫🇷 [Version française](README.fr.md)
+
 SavedViews adds a bar of bookmark tabs above every Dolibarr list page. Each user can save the current view — search filters, selected columns, list/kanban display mode — under a name, and reopen it later in one click.
 
 ![Concept](docs/screenshot.png)
