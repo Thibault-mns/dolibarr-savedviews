@@ -3,6 +3,10 @@ ModuleSavedViewsName=SavedViews
 SavedViewsDescription=Sauvegarde et restauration de vues personnalisées (filtres, colonnes, mode d'affichage) sur les pages de liste
 SavedViewsDescriptionLong=Ajoute une barre d'onglets au-dessus de chaque page de liste Dolibarr, permettant à chaque utilisateur d'enregistrer la vue courante (filtres de recherche, colonnes sélectionnées, mode liste/kanban) et de la rouvrir en un clic. Les vues sont propres à chaque utilisateur et à chaque liste.
 
+# Libellés des permissions (ids construits sur le numéro de module 185429)
+Permission18542901=Utiliser les vues sauvegardées (lecture)
+Permission18542902=Créer, modifier et supprimer ses propres vues
+
 SaveView=Enregistrer la vue
 EnterViewLabel=Entrez un nom pour cette vue
 DeleteView=Supprimer cette vue

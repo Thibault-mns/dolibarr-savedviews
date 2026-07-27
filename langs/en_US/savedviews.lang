@@ -3,6 +3,10 @@ ModuleSavedViewsName=SavedViews
 SavedViewsDescription=Save and restore custom views (filters, columns, display mode) on list pages
 SavedViewsDescriptionLong=Adds a bar of bookmark tabs above every Dolibarr list page, letting each user save the current view (search filters, selected columns, list/kanban mode) and reopen it in one click. Views are per-user and per-list.
 
+# Permission labels (ids built from the module number 185429)
+Permission18542901=Use saved views (read)
+Permission18542902=Create, update and delete own saved views
+
 SaveView=Save view
 EnterViewLabel=Enter a name for this view
 DeleteView=Delete this view

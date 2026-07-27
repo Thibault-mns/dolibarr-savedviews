@@ -74,9 +74,22 @@ class ActionsSavedviews
     {
         global $conf, $user, $langs;
 
-        if (empty($user->id)) {
+        // The hook can be called more than once on a page: inject the payload only once
+        static $alreadyinjected = false;
+        if ($alreadyinjected) {
             return 0;
         }
+
+        // Permissions. 'read' is required to see and apply views, 'create' to manage them.
+        // Note: rights are stored in llx_rights_def when the module is enabled, so an
+        // install upgraded from 1.0.x must be disabled/re-enabled to get them.
+        if (empty($user->id) || !$user->hasRight('savedviews', 'read')) {
+            return 0;
+        }
+
+        $canCreate = $user->hasRight('savedviews', 'create') ? 1 : 0;
+
+        $alreadyinjected = true;
 
         $langs->load('savedviews@savedviews');
 
@@ -103,9 +116,10 @@ class ActionsSavedviews
 
         echo '<script>
             window.savedviews_config = {
-                token: "' . newToken() . '",
+                token: "' . (currentToken() ?: newToken()) . '",
                 ajaxUrl: "' . dol_buildpath('/savedviews/ajax/savedviews.php', 1) . '",
                 currentPage: ' . json_encode($currentPage) . ',
+                canCreate: ' . $canCreate . ',
                 views: ' . json_encode($viewsData) . ',
                 labels: {
                     saveView: ' . json_encode($langs->transnoentities('SaveView')) . ',

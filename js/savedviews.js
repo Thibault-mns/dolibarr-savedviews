@@ -223,6 +223,10 @@
      * Save current view via AJAX
      */
     function saveView(label) {
+        if (!config.canCreate) {
+            return;
+        }
+
         const viewState = captureViewState();
 
         const formData = new FormData();
@@ -236,14 +240,15 @@
             method: 'POST',
             body: formData
         })
+        // Response shape follows core JsonResponse: {result, msg, newToken, data}
         .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                config.views.push(data.view);
+        .then(json => {
+            if (json.result == 1) {
+                config.views.push(json.data.view);
                 renderViewTabs();
                 showNotification(config.labels.viewSaved, 'success');
             } else {
-                showNotification(data.error || config.labels.error, 'error');
+                showNotification(json.msg || config.labels.error, 'error');
             }
         })
         .catch(error => {
@@ -256,6 +261,10 @@
      * Delete a saved view via AJAX
      */
     function deleteView(viewId) {
+        if (!config.canCreate) {
+            return;
+        }
+
         if (!confirm(config.labels.confirmDelete)) {
             return;
         }
@@ -270,13 +279,13 @@
             body: formData
         })
         .then(response => response.json())
-        .then(data => {
-            if (data.success) {
+        .then(json => {
+            if (json.result == 1) {
                 config.views = config.views.filter(v => v.id !== viewId);
                 renderViewTabs();
                 showNotification(config.labels.viewDeleted, 'success');
             } else {
-                showNotification(data.error || config.labels.error, 'error');
+                showNotification(json.msg || config.labels.error, 'error');
             }
         })
         .catch(error => {
@@ -375,28 +384,38 @@
                 applyViewState(view.view_data);
             });
 
-            const deleteBtn = document.createElement('span');
-            deleteBtn.className = 'savedviews-tab-delete';
-            deleteBtn.innerHTML = '&times;';
-            deleteBtn.title = config.labels.deleteView;
-            deleteBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                deleteView(view.id);
-            });
-
             tab.appendChild(tabLabel);
-            tab.appendChild(deleteBtn);
+
+            // Delete/save UI only for users holding the 'create' right
+            if (config.canCreate) {
+                const deleteBtn = document.createElement('span');
+                deleteBtn.className = 'savedviews-tab-delete';
+                deleteBtn.innerHTML = '&times;';
+                deleteBtn.title = config.labels.deleteView;
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    deleteView(view.id);
+                });
+                tab.appendChild(deleteBtn);
+            }
+
             tabsWrapper.appendChild(tab);
         });
 
-        // Add "+" button to save new view
-        const addBtn = document.createElement('div');
-        addBtn.className = 'savedviews-add';
-        addBtn.innerHTML = '<span class="fa fa-plus"></span>';
-        addBtn.title = config.labels.saveView;
-        addBtn.addEventListener('click', promptSaveView);
+        if (config.canCreate) {
+            // Add "+" button to save new view
+            const addBtn = document.createElement('div');
+            addBtn.className = 'savedviews-add';
+            addBtn.innerHTML = '<span class="fa fa-plus"></span>';
+            addBtn.title = config.labels.saveView;
+            addBtn.addEventListener('click', promptSaveView);
 
-        tabsWrapper.appendChild(addBtn);
+            tabsWrapper.appendChild(addBtn);
+        } else if (config.views.length === 0) {
+            // Nothing to show and nothing to create: do not display an empty bar
+            return;
+        }
+
         container.appendChild(tabsWrapper);
 
         // Insert after the title table
