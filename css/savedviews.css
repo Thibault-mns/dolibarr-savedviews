@@ -17,15 +17,13 @@
 
 .savedviews-tab {
     display: inline-flex;
-    align-items: center;
+    align-items: stretch;
     background: #f4f4f4;
     border: 1px solid #ccc;
     border-radius: 4px;
-    padding: 4px 8px;
     font-size: 0.85em;
-    cursor: pointer;
     transition: all 0.2s ease;
-    max-width: 150px;
+    max-width: 240px;
 }
 
 .savedviews-tab:hover {
@@ -33,29 +31,146 @@
     border-color: #999;
 }
 
+.savedviews-tab-label,
+.savedviews-tab-menu {
+    font: inherit;
+    background: none;
+    border: 0;
+    margin: 0;
+    cursor: pointer;
+    color: inherit;
+}
+
 .savedviews-tab-label {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    max-width: 120px;
+    max-width: 200px;
+    padding: 5px 8px;
     color: #333;
+    border-radius: 4px 0 0 4px;
 }
 
-.savedviews-tab-delete {
-    margin-left: 6px;
-    color: #999;
+/* View currently displayed: theme accent border, tinted background, bold label */
+.savedviews-tab-current {
+    border-color: var(--colorbackhmenu1, #263c5c);
+    box-shadow: inset 0 -2px 0 var(--colorbackhmenu1, #263c5c);
+    background: #fff;
+}
+
+.savedviews-tab-current .savedviews-tab-label {
     font-weight: bold;
-    font-size: 1.1em;
-    line-height: 1;
-    padding: 0 2px;
-    border-radius: 3px;
-    transition: all 0.2s ease;
 }
 
-.savedviews-tab-delete:hover {
-    color: #c00;
-    background: rgba(200, 0, 0, 0.1);
+.savedviews-tab-current .savedviews-tab-menu {
+    border-left-color: var(--colorbackhmenu1, #263c5c);
 }
+
+/* Displayed view whose filters were changed since it was opened */
+.savedviews-tab-modified {
+    border-style: dashed;
+    box-shadow: none;
+}
+
+.savedviews-tab-modified .savedviews-tab-label {
+    font-style: italic;
+}
+
+.savedviews-tab-modified-dot {
+    margin-left: 4px;
+    font-style: normal;
+    color: var(--colorbackhmenu1, #263c5c);
+}
+
+/* Actions trigger: separated from the label, wide enough to aim at */
+.savedviews-tab-menu {
+    flex: 0 0 auto;
+    min-width: 26px;
+    padding: 0 8px;
+    border-left: 1px solid #ccc;
+    border-radius: 0 4px 4px 0;
+    color: #777;
+}
+
+.savedviews-tab-menu:hover,
+.savedviews-tab-menu[aria-expanded="true"] {
+    color: #333;
+    background: rgba(0, 0, 0, 0.08);
+}
+
+.savedviews-tab-label:focus-visible,
+.savedviews-tab-menu:focus-visible,
+.savedviews-menu-item:focus-visible {
+    outline: 2px solid var(--colortextlink, #0a1464);
+    outline-offset: -2px;
+}
+
+/* Actions menu (appended to body, fixed position) */
+.savedviews-menu {
+    position: fixed;
+    z-index: 10001;
+    min-width: 200px;
+    padding: 4px 0;
+    background: var(--colorbackbody, #fff);
+    color: var(--colortext, #333);
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    font-size: 0.9em;
+}
+
+.savedviews-menu-item {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-height: 32px;
+    padding: 6px 14px;
+    background: none;
+    border: 0;
+    font: inherit;
+    color: inherit;
+    text-align: left;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.savedviews-menu-item:hover,
+.savedviews-menu-item:focus {
+    background: rgba(0, 0, 0, 0.06);
+}
+
+.savedviews-menu-icon {
+    width: 16px;
+    margin-right: 10px;
+    text-align: center;
+    opacity: 0.7;
+}
+
+.savedviews-menu-item-danger {
+    color: #b3261e;
+}
+
+.savedviews-menu-item-danger .savedviews-menu-icon {
+    opacity: 1;
+}
+
+.savedviews-menu-separator {
+    height: 1px;
+    margin: 4px 0;
+    background: #ddd;
+}
+
+.savedviews-tab-icon {
+    margin-right: 4px;
+    opacity: 0.6;
+    font-size: 0.9em;
+}
+
+.savedviews-tab-icon.fa-star {
+    color: #e0a800;
+    opacity: 1;
+}
+
 
 .savedviews-add {
     display: inline-flex;
@@ -79,6 +194,34 @@
 
 .savedviews-add .fa {
     font-size: 14px;
+}
+
+/* Save / edit dialog */
+.savedviews-dialog-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 12px;
+    margin: 10px 0;
+}
+
+.savedviews-dialog-label {
+    flex: 0 0 170px;
+}
+
+.savedviews-dialog-field {
+    flex: 1 1 260px;
+    min-width: 0;
+}
+
+.savedviews-dialog-scopes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 14px;
+}
+
+.savedviews-dialog-scope {
+    white-space: nowrap;
 }
 
 /* Notification styles (fallback if Dolibarr's setEventMessages is not available) */
@@ -121,8 +264,32 @@ body.theme-md-dark .savedviews-tab:hover {
 }
 
 body.theme-eldy-dark .savedviews-tab-label,
-body.theme-md-dark .savedviews-tab-label {
+body.theme-md-dark .savedviews-tab-label,
+body.theme-eldy-dark .savedviews-tab-menu,
+body.theme-md-dark .savedviews-tab-menu {
     color: #ddd;
+}
+
+body.theme-eldy-dark .savedviews-tab-menu,
+body.theme-md-dark .savedviews-tab-menu {
+    border-left-color: #555;
+}
+
+body.theme-eldy-dark .savedviews-tab-current,
+body.theme-md-dark .savedviews-tab-current {
+    background: #2b2b2b;
+}
+
+body.theme-eldy-dark .savedviews-menu,
+body.theme-md-dark .savedviews-menu {
+    background: #2b2b2b;
+    color: #ddd;
+    border-color: #555;
+}
+
+body.theme-eldy-dark .savedviews-menu-item-danger,
+body.theme-md-dark .savedviews-menu-item-danger {
+    color: #ff8a80;
 }
 
 body.theme-eldy-dark .savedviews-add,

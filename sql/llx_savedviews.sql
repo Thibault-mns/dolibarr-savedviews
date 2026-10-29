@@ -11,6 +11,7 @@ CREATE TABLE llx_savedviews (
     fk_user         INTEGER NOT NULL,
     page_url        VARCHAR(255) NOT NULL,
     label           VARCHAR(128) NOT NULL,
+    scope           TINYINT DEFAULT 0 NOT NULL,    -- 0 = private, 1 = user groups, 2 = all users
     view_data       TEXT NOT NULL,
     position        INTEGER DEFAULT 0,
     date_creation   DATETIME NOT NULL,

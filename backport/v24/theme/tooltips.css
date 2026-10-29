@@ -1,0 +1,50 @@
+/* ------------------------------------------------------------------
+ * SavedViews : backport of the themes of the jQuery tooltips of Dolibarr 24 (theme/eldy/tooltips.inc.css,
+ * same in theme/md), for Dolibarr < 24. Loaded by the printCommonFooter hook only on these versions.
+ * Used by the tooltips of the saved view tabs (class savedviews-tooltip, js/savedviews.js)
+ * ------------------------------------------------------------------ */
+:root{
+	--tooltip-txt-color: #1f2937;
+	--tooltip-bg-color:  #ffffff;
+	--tooltip-border-color: #d1d5db;
+
+	--tooltip-txt-color-dark-theme: #f9fafb;
+	--tooltip-bg-color-dark-theme: #1f2937;
+	--tooltip-border-color-dark-theme: #374151;
+}
+
+/* ********************** */
+/* JQUERY TOOLTIPS  THEME */
+/* ********************** */
+
+/** Style tooltip Jquery */
+div.ui-tooltip.jquery-tooltip {
+	padding: 0.5rem 0.75rem;
+	font-size: 0.875rem;
+	font-weight: 500;
+	line-height: 1.5;
+	font-family: InterVariable, system-ui, sans-serif;
+
+	/* Same as light theme */
+	color: var(--tooltip-txt-color);
+	background-color:  var(--tooltip-bg-color);
+	border: 1px solid var(--tooltip-border-color);
+
+	/*backdrop-filter: blur(3px); */ /* useless if background as no opacity under 1 value */
+
+	border-radius: 0.375rem;
+	box-shadow: 0 1px 20px rgba(0, 0, 0, 0.08);
+	pointer-events: none;
+}
+
+div.ui-tooltip.jquery-tooltip.--dark-mode {
+	color: var(--tooltip-txt-color-dark-theme) !important;
+	background-color:  var(--tooltip-bg-color-dark-theme) !important;
+	border: 1px solid var(--tooltip-border-color-dark-theme);
+}
+
+div.ui-tooltip.jquery-tooltip.--light-mode {
+	color: var(--tooltip-txt-color) !important;
+	background-color:  var(--tooltip-bg-color) !important;
+	border: 1px solid var(--tooltip-border-color);
+}

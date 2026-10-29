@@ -1,0 +1,39 @@
+# SavedViews language file - German
+ModuleSavedViewsName=SavedViews
+SavedViewsDescription=Speichern und Wiederherstellen eigener Ansichten (Filter, Spalten, Anzeigemodus) auf Listenseiten
+SavedViewsDescriptionLong=Fügt über jeder Dolibarr-Listenseite eine Leiste mit Lesezeichen-Reitern hinzu, mit der jeder Benutzer die aktuelle Ansicht (Suchfilter, ausgewählte Spalten, Listen-/Kanban-Modus) speichern und mit einem Klick wieder öffnen kann. Eine Ansicht ist standardmäßig privat und kann mit Benutzergruppen oder mit allen Benutzern geteilt werden. Jeder Benutzer kann pro Liste eine Standardansicht wählen.
+
+# Permission labels (ids built from the module number 185429)
+Permission18542901=Gespeicherte Ansichten verwenden (lesen)
+Permission18542902=Eigene gespeicherte Ansichten erstellen, ändern und löschen
+Permission18542903=Von anderen Benutzern geteilte Ansichten ändern und löschen
+
+SaveView=Ansicht speichern
+EditView=Ansicht bearbeiten
+ViewName=Name
+ViewScope=Sichtbarkeit
+ViewScopePrivate=Nur ich
+ViewScopeUserGroup=Benutzergruppen
+ViewScopePublic=Alle Benutzer
+ViewUserGroups=Gruppen
+ViewIsDefault=Meine Standardansicht
+ViewIsDefaultHelp=Wird automatisch geöffnet, wenn Sie diese Liste aufrufen
+ViewReplaceWithCurrent=Durch die aktuellen Filter und Spalten ersetzen
+ViewSharedBy=Geteilt von
+ViewReadOnly=Diese Ansicht wurde mit Ihnen geteilt: Sie können sie nur als Ihre Standardansicht festlegen.
+DefaultView=Standardansicht
+DeleteView=Diese Ansicht löschen
+ConfirmDeleteView=Möchten Sie diese Ansicht wirklich löschen?
+ViewSaved=Ansicht erfolgreich gespeichert
+ViewDeleted=Ansicht gelöscht
+ViewNameRequired=Geben Sie einen Namen für diese Ansicht ein
+ViewGroupRequired=Wählen Sie mindestens eine Benutzergruppe aus
+ViewActions=Aktionen der Ansicht
+ViewMenuEdit=Bearbeiten…
+ViewMenuDelete=Löschen…
+ViewSetDefault=Als meine Standardansicht verwenden
+ViewUnsetDefault=Nicht mehr als Standard verwenden
+ViewCurrentModified=Filter oder Spalten seit dem Öffnen der Ansicht geändert
+ViewUpdateWithCurrent=Mit den aktuellen Filtern aktualisieren
+ViewSharedWithAll=Mit allen Benutzern geteilt
+ViewSharedWithGroups=Mit Benutzergruppen geteilt

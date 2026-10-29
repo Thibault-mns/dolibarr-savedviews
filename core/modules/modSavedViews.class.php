@@ -50,7 +50,7 @@ class modSavedViews extends DolibarrModules
         $this->descriptionlong = "SavedViewsDescriptionLong";
         $this->editor_name = 'TH Investissements / Matelas No Stress';
         $this->editor_url = 'https://github.com/Thibault-mns';
-        $this->version = '1.1.0';
+        $this->version = '1.2.0';
         $this->const_name = 'MAIN_MODULE_' . strtoupper($this->name);
         $this->picto = 'fa-bookmark';
 
@@ -78,8 +78,8 @@ class modSavedViews extends DolibarrModules
 
         // Permissions.
         // Labels are also translatable through the keys Permission<id> of savedviews.lang.
-        // Both are granted by default (index 3 = 1) so a new user gets the feature without
-        // any setup, while an admin can still revoke read and/or create for a given user/group.
+        // read and create are granted by default (index 3 = 1) so a new user gets the feature
+        // without any setup, while an admin can still revoke them for a given user/group.
         $this->rights = [];
         $r = 0;
 
@@ -96,6 +96,14 @@ class modSavedViews extends DolibarrModules
         $this->rights[$r][1] = 'Create, update and delete own saved views';
         $this->rights[$r][3] = 1;
         $this->rights[$r][4] = 'create';
+        $this->rights[$r][5] = '';
+        $r++;
+
+        // Manage: modify and delete the views shared by other users (never their private ones)
+        $this->rights[$r][0] = (int) ($this->numero . sprintf("%02d", $r + 1));
+        $this->rights[$r][1] = 'Modify and delete the views shared by other users';
+        $this->rights[$r][3] = 0;
+        $this->rights[$r][4] = 'manage';
         $this->rights[$r][5] = '';
     }
 

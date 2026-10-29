@@ -1,15 +1,39 @@
 # SavedViews language file - English
 ModuleSavedViewsName=SavedViews
 SavedViewsDescription=Save and restore custom views (filters, columns, display mode) on list pages
-SavedViewsDescriptionLong=Adds a bar of bookmark tabs above every Dolibarr list page, letting each user save the current view (search filters, selected columns, list/kanban mode) and reopen it in one click. Views are per-user and per-list.
+SavedViewsDescriptionLong=Adds a bar of bookmark tabs above every Dolibarr list page, letting each user save the current view (search filters, selected columns, list/kanban mode) and reopen it in one click. A view is private by default and can be shared with user groups or with all users. Each user can pick a default view per list.
 
 # Permission labels (ids built from the module number 185429)
 Permission18542901=Use saved views (read)
 Permission18542902=Create, update and delete own saved views
+Permission18542903=Modify and delete the views shared by other users
 
 SaveView=Save view
-EnterViewLabel=Enter a name for this view
+EditView=Edit view
+ViewName=Name
+ViewScope=Visibility
+ViewScopePrivate=Only me
+ViewScopeUserGroup=User groups
+ViewScopePublic=All users
+ViewUserGroups=Groups
+ViewIsDefault=My default view
+ViewIsDefaultHelp=Opened automatically when you come to this list
+ViewReplaceWithCurrent=Replace with the current filters and columns
+ViewSharedBy=Shared by
+ViewReadOnly=This view is shared with you: you can only make it your default view.
+DefaultView=Default view
 DeleteView=Delete this view
 ConfirmDeleteView=Are you sure you want to delete this view?
 ViewSaved=View saved successfully
 ViewDeleted=View deleted
+ViewNameRequired=Enter a name for this view
+ViewGroupRequired=Select at least one user group
+ViewActions=View actions
+ViewMenuEdit=Edit…
+ViewMenuDelete=Delete…
+ViewSetDefault=Use as my default view
+ViewUnsetDefault=Stop using as default view
+ViewCurrentModified=Filters or columns changed since this view was opened
+ViewUpdateWithCurrent=Update with the current filters
+ViewSharedWithAll=Shared with all users
+ViewSharedWithGroups=Shared with user groups

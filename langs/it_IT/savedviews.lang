@@ -1,0 +1,39 @@
+# SavedViews language file - Italian
+ModuleSavedViewsName=SavedViews
+SavedViewsDescription=Salvataggio e ripristino di viste personalizzate (filtri, colonne, modalità di visualizzazione) nelle pagine elenco
+SavedViewsDescriptionLong=Aggiunge una barra di schede sopra ogni pagina elenco di Dolibarr, che permette a ogni utente di salvare la vista corrente (filtri di ricerca, colonne selezionate, modalità elenco/kanban) e di riaprirla con un clic. Una vista è privata per impostazione predefinita e può essere condivisa con gruppi di utenti o con tutti gli utenti. Ogni utente può scegliere una vista predefinita per ogni elenco.
+
+# Permission labels (ids built from the module number 185429)
+Permission18542901=Usare le viste salvate (lettura)
+Permission18542902=Creare, modificare ed eliminare le proprie viste
+Permission18542903=Modificare ed eliminare le viste condivise da altri utenti
+
+SaveView=Salva la vista
+EditView=Modifica la vista
+ViewName=Nome
+ViewScope=Visibilità
+ViewScopePrivate=Solo io
+ViewScopeUserGroup=Gruppi di utenti
+ViewScopePublic=Tutti gli utenti
+ViewUserGroups=Gruppi
+ViewIsDefault=La mia vista predefinita
+ViewIsDefaultHelp=Aperta automaticamente quando arrivi su questo elenco
+ViewReplaceWithCurrent=Sostituisci con i filtri e le colonne attuali
+ViewSharedBy=Condivisa da
+ViewReadOnly=Questa vista è condivisa con te: puoi solo renderla la tua vista predefinita.
+DefaultView=Vista predefinita
+DeleteView=Elimina questa vista
+ConfirmDeleteView=Sei sicuro di voler eliminare questa vista?
+ViewSaved=Vista salvata con successo
+ViewDeleted=Vista eliminata
+ViewNameRequired=Inserisci un nome per questa vista
+ViewGroupRequired=Seleziona almeno un gruppo di utenti
+ViewActions=Azioni sulla vista
+ViewMenuEdit=Modifica…
+ViewMenuDelete=Elimina…
+ViewSetDefault=Usa come mia vista predefinita
+ViewUnsetDefault=Non usare più come predefinita
+ViewCurrentModified=Filtri o colonne modificati dall'apertura della vista
+ViewUpdateWithCurrent=Aggiorna con i filtri attuali
+ViewSharedWithAll=Condivisa con tutti gli utenti
+ViewSharedWithGroups=Condivisa con gruppi di utenti

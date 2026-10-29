@@ -123,6 +123,11 @@ if (empty($user->id)) {
 
 $action = GETPOST('action', 'aZ09');
 
+// Write actions are POST only, so the CSRF token never travels in a URL
+if (in_array($action, ['save', 'update', 'delete', 'setdefault'], true) && $_SERVER['REQUEST_METHOD'] !== 'POST') {
+    savedviewsRespond(0, null, 'Method not allowed', 405);
+}
+
 // CSRF token check. main.inc.php only enforces it when MAIN_SECURITY_CSRF_WITH_TOKEN is set
 // (not the default), so the token is compared here for every action. currentToken() is the
 // value to use for AJAX calls and the one the page injects; this script sets NOTOKENRENEWAL so
@@ -137,14 +142,15 @@ if (GETPOST('errorcode', 'alpha') === 'InvalidToken'
     savedviewsRespond(0, null, 'Invalid or missing CSRF token', 403);
 }
 
-// Permissions: 'read' to list/apply views, 'create' for every write action
+// Permissions: 'read' to list/apply views and choose a default one, 'create' to save new views.
+// Updating or deleting an existing view is checked per view by SavedView::canEdit().
 $canRead = $user->hasRight('savedviews', 'read');
 $canCreate = $user->hasRight('savedviews', 'create');
 
 if (!$canRead) {
     savedviewsRespond(0, null, 'Insufficient permissions', 403);
 }
-if (in_array($action, ['save', 'update', 'delete'], true) && !$canCreate) {
+if ($action === 'save' && !$canCreate) {
     savedviewsRespond(0, null, 'Insufficient permissions', 403);
 }
 
@@ -153,6 +159,114 @@ function savedviewsSanitizePageUrl($raw) {
     $url = trim($raw);
     $url = preg_replace('#[^a-zA-Z0-9/_\-\.\?=]#', '', $url);
     return $url;
+}
+
+/**
+ * Decode and sanitize the posted view_data
+ *
+ * @param string $raw     Raw JSON
+ * @param string $pageUrl Page key of the view
+ * @return array
+ * @throws Exception
+ */
+function savedviewsReadViewData($raw, $pageUrl)
+{
+    if (strlen($raw) > SavedView::VIEW_DATA_MAX_LENGTH) {
+        throw new Exception('View data too large', 413);
+    }
+    $viewData = json_decode($raw, true);
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        throw new Exception('Invalid view_data JSON: ' . json_last_error_msg(), 400);
+    }
+
+    return SavedView::sanitizeViewData($viewData, $pageUrl);
+}
+
+/**
+ * Read the sharing fields (scope + user groups) from the request into a view
+ *
+ * @param SavedView $savedView View
+ * @return void
+ * @throws Exception
+ */
+function savedviewsReadSharing($savedView)
+{
+    $savedView->scope = SavedView::normalizeScope(GETPOST('scope', 'int'));
+    $groups = GETPOST('usergroups', 'array');
+    $savedView->usergroups = is_array($groups) ? array_map('intval', $groups) : [];
+    if ($savedView->scope == SavedView::SCOPE_USERGROUP && empty(array_filter($savedView->usergroups))) {
+        throw new Exception('Select at least one user group', 400);
+    }
+}
+
+/**
+ * Log a database error and return a message safe to show to the user
+ *
+ * @param SavedView $savedView View holding the error
+ * @param string    $context   What failed
+ * @return string
+ */
+function savedviewsDbError($savedView, $context)
+{
+    dol_syslog('savedviews ' . $context . ': ' . $savedView->error, LOG_ERR);
+    return $context;
+}
+
+/**
+ * Load a view the current user can see, or throw
+ *
+ * @param DoliDB $db   Database handler
+ * @param User   $user Current user
+ * @param int    $id   View id
+ * @return SavedView
+ * @throws Exception
+ */
+function savedviewsFetchVisible($db, $user, $id)
+{
+    if (empty($id)) {
+        throw new Exception('Missing view ID', 400);
+    }
+
+    $savedView = new SavedView($db);
+    $result = $savedView->fetch($id);
+    if ($result < 0) {
+        throw new Exception(savedviewsDbError($savedView, 'Failed to fetch view'), 500);
+    }
+    // Views the user cannot see are reported as missing, not as forbidden
+    if ($result == 0 || !$savedView->isVisibleBy($user)) {
+        throw new Exception('View not found', 404);
+    }
+
+    return $savedView;
+}
+
+/**
+ * Apply the posted is_default flag for the current user
+ *
+ * @param DoliDB    $db        Database handler
+ * @param User      $user      Current user
+ * @param SavedView $savedView View
+ * @return void
+ * @throws Exception
+ */
+function savedviewsApplyDefault($db, $user, $savedView)
+{
+    if (!GETPOSTISSET('is_default')) {
+        return;
+    }
+    $isDefault = GETPOST('is_default', 'int') ? true : false;
+    $currentDefault = SavedView::getDefaultId($user, $savedView->page_url);
+
+    if ($isDefault && $currentDefault != $savedView->id) {
+        $result = SavedView::setDefaultId($db, $user, $savedView->page_url, $savedView->id);
+    } elseif (!$isDefault && $currentDefault == $savedView->id) {
+        $result = SavedView::setDefaultId($db, $user, $savedView->page_url, 0);
+    } else {
+        return;
+    }
+    if ($result < 0) {
+        throw new Exception('Failed to save the default view', 500);
+    }
 }
 
 // Exception codes are used as HTTP status codes by the handler below
@@ -167,92 +281,73 @@ try {
                 throw new Exception('Missing required parameters', 400);
             }
 
-            $viewData = json_decode($viewDataRaw, true);
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                throw new Exception('Invalid view_data JSON: ' . json_last_error_msg(), 400);
-            }
-
             $savedView = new SavedView($db);
             $savedView->page_url = $pageUrl;
             $savedView->label = dol_trunc($label, 128, 'right', 'UTF-8', 1);
-            $savedView->view_data = $viewData;
+            $savedView->view_data = savedviewsReadViewData($viewDataRaw, $pageUrl);
+            savedviewsReadSharing($savedView);
 
             $result = $savedView->create($user);
             if ($result <= 0) {
-                throw new Exception($savedView->error ?: 'Failed to create view', 500);
+                throw new Exception(savedviewsDbError($savedView, 'Failed to create view'), 500);
             }
+            savedviewsApplyDefault($db, $user, $savedView);
 
-            savedviewsRespond(1, ['view' => $savedView->toArray()]);
+            savedviewsRespond(1, ['view' => $savedView->toArray($user)]);
             break;
 
         case 'update':
-            $id = GETPOSTINT('id');
-            $label = GETPOST('label', 'alphanohtml');
-            $viewDataRaw = GETPOST('view_data', 'none');
-
-            if (empty($id)) {
-                throw new Exception('Missing view ID', 400);
-            }
-
-            $savedView = new SavedView($db);
-            $result = $savedView->fetch($id);
-
-            if ($result < 0) {
-                throw new Exception($savedView->error ?: 'Failed to fetch view', 500);
-            }
-            if ($result == 0) {
-                throw new Exception('View not found', 404);
-            }
-
-            // A view belongs to a single user: nobody else may modify it, admin included
-            if ($savedView->fk_user != $user->id) {
+            $savedView = savedviewsFetchVisible($db, $user, GETPOSTINT('id'));
+            if (!$savedView->canEdit($user)) {
                 throw new Exception('Access denied', 403);
             }
 
+            $label = GETPOST('label', 'alphanohtml');
             if (!empty($label)) {
                 $savedView->label = dol_trunc($label, 128, 'right', 'UTF-8', 1);
             }
-
+            if (GETPOSTISSET('scope')) {
+                savedviewsReadSharing($savedView);
+            }
+            // "Replace with the current view": new filters, columns and display mode
+            $viewDataRaw = GETPOST('view_data', 'none');
             if (!empty($viewDataRaw)) {
-                $viewData = json_decode($viewDataRaw, true);
-                if (json_last_error() !== JSON_ERROR_NONE) {
-                    throw new Exception('Invalid view_data JSON: ' . json_last_error_msg(), 400);
-                }
-                $savedView->view_data = $viewData;
+                $savedView->view_data = savedviewsReadViewData($viewDataRaw, $savedView->page_url);
+            } else {
+                // Views saved before 1.2.0 were not sanitized and may now get shared
+                $savedView->view_data = SavedView::sanitizeViewData($savedView->view_data, $savedView->page_url);
             }
 
             $result = $savedView->update($user);
             if ($result <= 0) {
-                throw new Exception($savedView->error ?: 'Failed to update view', 500);
+                throw new Exception(savedviewsDbError($savedView, 'Failed to update view'), 500);
             }
+            savedviewsApplyDefault($db, $user, $savedView);
 
-            savedviewsRespond(1, ['view' => $savedView->toArray()]);
+            savedviewsRespond(1, ['view' => $savedView->toArray($user)]);
+            break;
+
+        case 'setdefault':
+            // Personal preference: any view the user can see may become his default one
+            $savedView = savedviewsFetchVisible($db, $user, GETPOSTINT('id'));
+            savedviewsApplyDefault($db, $user, $savedView);
+
+            savedviewsRespond(1, ['view' => $savedView->toArray($user)]);
             break;
 
         case 'delete':
-            $id = GETPOSTINT('id');
-
-            if (empty($id)) {
-                throw new Exception('Missing view ID', 400);
-            }
-
-            $savedView = new SavedView($db);
-            $result = $savedView->fetch($id);
-
-            if ($result < 0) {
-                throw new Exception($savedView->error ?: 'Failed to fetch view', 500);
-            }
-            if ($result == 0) {
-                throw new Exception('View not found', 404);
-            }
-
-            if ($savedView->fk_user != $user->id) {
+            $savedView = savedviewsFetchVisible($db, $user, GETPOSTINT('id'));
+            if (!$savedView->canEdit($user)) {
                 throw new Exception('Access denied', 403);
+            }
+
+            if (SavedView::getDefaultId($user, $savedView->page_url) == $savedView->id) {
+                SavedView::setDefaultId($db, $user, $savedView->page_url, 0);
             }
 
             $result = $savedView->delete($user);
             if ($result <= 0) {
-                throw new Exception($savedView->error ?: 'Failed to delete view', 500);
+                throw new Exception(savedviewsDbError($savedView, 'Failed to delete view'), 500);
             }
 
             savedviewsRespond(1);
@@ -262,15 +357,15 @@ try {
             $pageUrl = savedviewsSanitizePageUrl(GETPOST('page_url', 'none'));
 
             $savedView = new SavedView($db);
-            $views = $savedView->fetchAllForUser($user->id, $pageUrl);
+            $views = $savedView->fetchAllVisible($user, $pageUrl);
 
             if (!is_array($views)) {
-                throw new Exception($savedView->error ?: 'Failed to fetch views', 500);
+                throw new Exception(savedviewsDbError($savedView, 'Failed to fetch views'), 500);
             }
 
             $viewsData = [];
             foreach ($views as $view) {
-                $viewsData[] = $view->toArray();
+                $viewsData[] = $view->toArray($user);
             }
 
             savedviewsRespond(1, ['views' => $viewsData]);

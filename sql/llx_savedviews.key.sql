@@ -5,4 +5,7 @@
 -- the Free Software Foundation; either version 3 of the License, or
 -- (at your option) any later version.
 
--- No additional keys needed, indexes are defined in main table
+-- Indexes are defined in the main table.
+-- Upgrade from 1.1.x: run after llx_savedviews.sql on every module activation,
+-- "column already exists" errors are ignored by the module loader.
+ALTER TABLE llx_savedviews ADD COLUMN scope TINYINT DEFAULT 0 NOT NULL;

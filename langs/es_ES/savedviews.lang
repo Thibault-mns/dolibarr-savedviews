@@ -1,0 +1,39 @@
+# SavedViews language file - Spanish
+ModuleSavedViewsName=SavedViews
+SavedViewsDescription=Guardar y restaurar vistas personalizadas (filtros, columnas, modo de visualización) en las páginas de listado
+SavedViewsDescriptionLong=Añade una barra de pestañas encima de cada página de listado de Dolibarr, que permite a cada usuario guardar la vista actual (filtros de búsqueda, columnas seleccionadas, modo lista/kanban) y volver a abrirla con un clic. Una vista es privada por defecto y puede compartirse con grupos de usuarios o con todos los usuarios. Cada usuario puede elegir una vista por defecto por listado.
+
+# Permission labels (ids built from the module number 185429)
+Permission18542901=Usar las vistas guardadas (lectura)
+Permission18542902=Crear, modificar y eliminar sus propias vistas
+Permission18542903=Modificar y eliminar las vistas compartidas por otros usuarios
+
+SaveView=Guardar la vista
+EditView=Modificar la vista
+ViewName=Nombre
+ViewScope=Visibilidad
+ViewScopePrivate=Solo yo
+ViewScopeUserGroup=Grupos de usuarios
+ViewScopePublic=Todos los usuarios
+ViewUserGroups=Grupos
+ViewIsDefault=Mi vista por defecto
+ViewIsDefaultHelp=Se abre automáticamente al llegar a este listado
+ViewReplaceWithCurrent=Reemplazar por los filtros y columnas actuales
+ViewSharedBy=Compartida por
+ViewReadOnly=Esta vista está compartida con usted: solo puede convertirla en su vista por defecto.
+DefaultView=Vista por defecto
+DeleteView=Eliminar esta vista
+ConfirmDeleteView=¿Está seguro de que desea eliminar esta vista?
+ViewSaved=Vista guardada correctamente
+ViewDeleted=Vista eliminada
+ViewNameRequired=Introduzca un nombre para esta vista
+ViewGroupRequired=Seleccione al menos un grupo de usuarios
+ViewActions=Acciones de la vista
+ViewMenuEdit=Modificar…
+ViewMenuDelete=Eliminar…
+ViewSetDefault=Usar como mi vista por defecto
+ViewUnsetDefault=Dejar de usar por defecto
+ViewCurrentModified=Filtros o columnas modificados desde la apertura de la vista
+ViewUpdateWithCurrent=Actualizar con los filtros actuales
+ViewSharedWithAll=Compartida con todos los usuarios
+ViewSharedWithGroups=Compartida con grupos de usuarios
