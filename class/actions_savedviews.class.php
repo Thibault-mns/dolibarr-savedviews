@@ -123,6 +123,14 @@ class ActionsSavedviews
             return 0;
         }
 
+        // The target must carry a parameter outside $allowedKeys, otherwise it would be
+        // seen as a bare arrival again and redirect in a loop
+        $targetParams = [];
+        parse_str((string) parse_url($url, PHP_URL_QUERY), $targetParams);
+        if (empty(array_diff(array_keys($targetParams), $allowedKeys))) {
+            return 0;
+        }
+
         // Keep the menu context of the request
         foreach (['mainmenu', 'leftmenu'] as $key) {
             $value = GETPOST($key, 'aZ09');
